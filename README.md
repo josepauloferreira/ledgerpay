@@ -1,6 +1,6 @@
-# Ledger Wallet API
+# LedgerPay
 
-> uma API sandbox de conta digital construída incrementalmente para aprendizagem e portfólio Backend Java.
+> Backend Java sandbox para carteiras digitais e transferências.
 
 
 ## Status atual
