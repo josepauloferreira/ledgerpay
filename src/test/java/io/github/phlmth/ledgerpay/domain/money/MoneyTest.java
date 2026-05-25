@@ -15,4 +15,12 @@ class MoneyTest {
         assertThat(money.amount()).isEqualTo(expectedAmount);
     }
 
+    @Test
+    void shouldNormalizeValueWithoutDecimalPlaces() {
+        var expectedAmount = new BigDecimal("10.00");
+        
+        Money money = Money.of("10");
+
+        assertThat(money.amount()).isEqualTo(expectedAmount);
+    }
 }
