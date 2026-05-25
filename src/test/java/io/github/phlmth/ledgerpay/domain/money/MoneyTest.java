@@ -32,4 +32,13 @@ class MoneyTest {
 
         assertThat(money.amount()).isEqualTo(expectedAmount);
     }
+
+    @Test
+    void shouldNormalizeValueWithOneDecimalPlace() {
+        var expectedAmount = new BigDecimal("10.50");
+        
+        Money money = Money.of("10.5");
+
+        assertThat(money.amount()).isEqualTo(expectedAmount);
+    }
 }
