@@ -82,4 +82,10 @@ class MoneyTest {
 
         assertThat(money.amount()).isEqualTo(expectedAmount);
     }
+
+    @Test
+    void shouldRejectNullAmountFromCanonicalConstructor() {
+        assertThatThrownBy(() -> new Money(null))
+            .isInstanceOf(NullPointerException.class);
+    }
 }
