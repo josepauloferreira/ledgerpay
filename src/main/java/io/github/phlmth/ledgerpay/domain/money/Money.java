@@ -5,7 +5,11 @@ import java.math.BigDecimal;
 public record Money(BigDecimal amount) {
 
     public Money {
-        amount = amount.setScale(2);
+        try {
+            amount = amount.setScale(2);
+        } catch (ArithmeticException exception) {
+            throw new IllegalArgumentException(exception);
+        }
     }
     public static Money of(String value) {
         return new Money(new BigDecimal(value));
