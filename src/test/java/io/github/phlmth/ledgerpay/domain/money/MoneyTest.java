@@ -1,5 +1,6 @@
 package io.github.phlmth.ledgerpay.domain.money;
 
+import java.beans.Transient;
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
@@ -62,5 +63,23 @@ class MoneyTest {
     void shouldRejectFractionalCentAmountFromCanonicalConstructor() {
         assertThatThrownBy(() -> new Money(new BigDecimal("10.001")))
             .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void shouldAllowZeroAmount() {
+        var expectedAmount = new BigDecimal("0.00");
+
+        Money money = Money.of("0.00");
+
+        assertThat(money.amount()).isEqualTo(expectedAmount);
+    }
+
+    @Test
+    void shouldAllowNegativeAmount() {
+        var expectedAmount = new BigDecimal("-10.00");
+
+        Money money = Money.of("-10.00");
+
+        assertThat(money.amount()).isEqualTo(expectedAmount);
     }
 }
