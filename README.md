@@ -3,11 +3,8 @@
 > Backend Java sandbox para carteiras digitais e transferências.
 
 
-
-
 ## Status atual
 projeto está na fase de fundação e modelagem inicial do domínio.
-
 
 ## Documentação
 - [Definição inicial do projeto](docs/00-project-definition.md)
@@ -18,6 +15,8 @@ projeto está na fase de fundação e modelagem inicial do domínio.
 - JUnit 5
 - AssertJ
 
+## Desenvolvimento com GitHub Codespaces
+O repositório possui uma configuração de dev container com Java 21 para criar um ambiente de desenvolvimento reproduzível no GitHub Codespaces.
 
 ## Como executar os testes
 ```bash
