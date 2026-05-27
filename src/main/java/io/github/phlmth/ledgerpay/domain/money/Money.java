@@ -5,16 +5,17 @@ import java.util.Objects;
 
 public record Money(BigDecimal amount) {
 
-    public Money {
-        Objects.requireNonNull(amount);
+  public Money {
+    Objects.requireNonNull(amount);
 
-        try {
-            amount = amount.setScale(2);
-        } catch (ArithmeticException exception) {
-            throw new IllegalArgumentException(exception);
-        }
+    try {
+      amount = amount.setScale(2);
+    } catch (ArithmeticException exception) {
+      throw new IllegalArgumentException(exception);
     }
-    public static Money of(String value) {
-        return new Money(new BigDecimal(value));
-    }
+  }
+
+  public static Money of(String value) {
+    return new Money(new BigDecimal(value));
+  }
 }
