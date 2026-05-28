@@ -35,4 +35,18 @@ class TreasuryFundingTest {
     assertThat(treasury.balance()).isEqualTo(Money.of("1000000.00"));
     assertThat(destination.balance()).isEqualTo(Money.of("0.00"));
   }
+
+  @Test
+  void shouldRejectNegativeFundingWithoutChangingBalances() {
+    Wallet treasury = new Wallet(Money.of("1000000.00"));
+    Wallet destination = new Wallet(Money.of("0.00"));
+    Money amount = Money.of("-10.00");
+    TreasuryFunding funding = new TreasuryFunding();
+
+    assertThatThrownBy(() -> funding.execute(treasury, destination, amount))
+        .isInstanceOf(IllegalArgumentException.class);
+
+    assertThat(treasury.balance()).isEqualTo(Money.of("1000000.00"));
+    assertThat(destination.balance()).isEqualTo(Money.of("0.00"));
+  }
 }
