@@ -103,4 +103,31 @@ class MoneyTest {
 
     assertThat(result).isEqualTo(Money.of("999900.00"));
   }
+
+  @Test
+  void shouldIdentifyPositiveAmount() {
+    Money money = Money.of("100.00");
+
+    boolean result = money.isPositive();
+
+    assertThat(result).isTrue();
+  }
+
+  @Test
+  void shouldIdentifyZeroAmountAsNotPositive() {
+    Money money = Money.of("0.00");
+
+    boolean result = money.isPositive();
+
+    assertThat(result).isFalse();
+  }
+
+  @Test
+  void shouldIdentifyNegativeAmountAsNotPositive() {
+    Money money = Money.of("-10.00");
+
+    boolean result = money.isPositive();
+
+    assertThat(result).isFalse();
+  }
 }
