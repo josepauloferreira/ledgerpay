@@ -85,4 +85,22 @@ class MoneyTest {
   void shouldRejectNullAmountFromCanonicalConstructor() {
     assertThatThrownBy(() -> new Money(null)).isInstanceOf(NullPointerException.class);
   }
+
+  @Test
+  void shouldAddAmounts() {
+    Money money = Money.of("0.00");
+
+    Money result = money.add(Money.of("100.00"));
+
+    assertThat(result).isEqualTo(Money.of("100.00"));
+  }
+
+  @Test
+  void shouldSubtractAmounts() {
+    Money money = Money.of("1000000.00");
+
+    Money result = money.subtract(Money.of("100.00"));
+
+    assertThat(result).isEqualTo(Money.of("999900.00"));
+  }
 }
