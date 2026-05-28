@@ -18,4 +18,12 @@ public record Money(BigDecimal amount) {
   public static Money of(String value) {
     return new Money(new BigDecimal(value));
   }
+
+  public Money add(Money other) {
+    return new Money(this.amount().add(other.amount()));
+  }
+
+  public Money subtract(Money other) {
+    return new Money(this.amount().subtract(other.amount()));
+  }
 }
