@@ -13,4 +13,8 @@ public class SystemTreasury {
   public Money balance() {
     return funds.balance();
   }
+
+  public void debit(Money amount) {
+    funds.debit(amount);
+  }
 }
