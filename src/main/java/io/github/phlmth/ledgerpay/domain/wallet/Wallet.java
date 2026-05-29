@@ -14,6 +14,10 @@ public class Wallet {
   }
 
   public void credit(Money amount) {
+    if (!amount.isPositive()) {
+      throw new IllegalArgumentException();
+    }
+
     balance = balance.add(amount);
   }
 
