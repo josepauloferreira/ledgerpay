@@ -130,4 +130,31 @@ class MoneyTest {
 
     assertThat(result).isFalse();
   }
+
+  @Test
+  void shouldIdentifySmallerAmount() {
+    Money money = Money.of("100.00");
+
+    boolean result = money.isLessThan(Money.of("150.00"));
+
+    assertThat(result).isTrue();
+  }
+
+  @Test
+  void shouldIdentifyEqualAmountAsNotSmaller() {
+    Money money = Money.of("100.00");
+
+    boolean result = money.isLessThan(Money.of("100.00"));
+
+    assertThat(result).isFalse();
+  }
+
+  @Test
+  void shouldIdentifyGreaterAmountAsNotSmaller() {
+    Money money = Money.of("150.00");
+
+    boolean result = money.isLessThan(Money.of("100.00"));
+
+    assertThat(result).isFalse();
+  }
 }
