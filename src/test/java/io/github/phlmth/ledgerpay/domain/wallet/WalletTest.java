@@ -9,6 +9,13 @@ import org.junit.jupiter.api.Test;
 class WalletTest {
 
   @Test
+  void shouldStartWithZeroBalance() {
+    Wallet wallet = new Wallet();
+
+    assertThat(wallet.balance()).isEqualTo(Money.of("0.00"));
+  }
+
+  @Test
   void shouldRejectDebitWhenBalanceIsInsufficient() {
     Wallet wallet = new Wallet(Money.of("100.00"));
 
