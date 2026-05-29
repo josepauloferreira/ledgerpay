@@ -18,6 +18,10 @@ public class Wallet {
   }
 
   public void debit(Money amount) {
+    if (balance.isLessThan(amount)) {
+      throw new IllegalStateException();
+    }
+
     balance = balance.subtract(amount);
   }
 }
