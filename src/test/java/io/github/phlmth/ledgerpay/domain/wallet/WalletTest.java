@@ -17,4 +17,24 @@ class WalletTest {
 
     assertThat(wallet.balance()).isEqualTo(Money.of("100.00"));
   }
+
+  @Test
+  void shouldRejectZeroDebit() {
+    Wallet wallet = new Wallet(Money.of("100.00"));
+
+    assertThatThrownBy(() -> wallet.debit(Money.of("0.00")))
+        .isInstanceOf(IllegalArgumentException.class);
+
+    assertThat(wallet.balance()).isEqualTo(Money.of("100.00"));
+  }
+
+  @Test
+  void shouldRejectNegativeDebit() {
+    Wallet wallet = new Wallet(Money.of("100.00"));
+
+    assertThatThrownBy(() -> wallet.debit(Money.of("-10.00")))
+        .isInstanceOf(IllegalArgumentException.class);
+
+    assertThat(wallet.balance()).isEqualTo(Money.of("100.00"));
+  }
 }
