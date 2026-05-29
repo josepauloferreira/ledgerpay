@@ -20,14 +20,18 @@ public record Money(BigDecimal amount) {
   }
 
   public Money add(Money other) {
-    return new Money(this.amount().add(other.amount()));
+    return new Money(amount().add(other.amount()));
   }
 
   public Money subtract(Money other) {
-    return new Money(this.amount().subtract(other.amount()));
+    return new Money(amount().subtract(other.amount()));
   }
 
   public boolean isPositive() {
-    return (amount().compareTo(BigDecimal.ZERO) > 0);
+    return amount().compareTo(BigDecimal.ZERO) > 0;
+  }
+
+  public boolean isLessThan(Money other) {
+    return amount().compareTo(other.amount()) < 0;
   }
 }
