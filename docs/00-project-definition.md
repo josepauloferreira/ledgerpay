@@ -1,62 +1,167 @@
-# LedgerPay — Definição Inicial do Projeto
+# LedgerPay — Initial Project Definition
 
-## Propósito
+## Project Summary
 
-O **LedgerPay** é um backend Java sandbox para carteiras digitais e transferências, concebido para simular movimentações financeiras entre carteiras em um ambiente controlado. O projeto será desenvolvido incrementalmente, com foco técnico em evoluir um domínio financeiro de forma consistente, rastreável e testável. Trata-se de uma aplicação de demonstração: não opera dinheiro real nem possui integração com instituições bancárias.
+LedgerPay is a Java backend sandbox for modeling digital wallets, money movement, and financial domain rules.
 
-## Cenário Sandbox
+## Main Objective
 
-- O cenário considera usuários comuns que poderão participar de movimentações financeiras simuladas.
-- Cada usuário terá uma única carteira denominada em **BRL**, criada inicialmente com saldo zero.
-- O sistema possuirá uma carteira interna denominada `SYSTEM_TREASURY`, responsável por representar a tesouraria do ambiente sandbox.
-- A `SYSTEM_TREASURY` iniciará com **BRL 1.000.000,00** fictícios e será a origem controlada dos valores distribuídos no ambiente.
-- O sistema deverá permitir funding sandbox da tesouraria para carteiras comuns e transferências entre carteiras de usuários.
-- Enquanto mecanismos adequados de segurança não forem introduzidos, as operações serão destinadas exclusivamente a execução local e demonstração controlada.
+Build a backend system that demonstrates:
+- monetary correctness
+- domain modeling
+- automated testing
+- safe financial operations
+- clear technical trade-offs
+- future readiness for persistence, APIs, idempotency, and ledger-based accounting
 
-## Escopo do MVP
+## Current Stage
 
-O MVP deverá entregar as seguintes capacidades:
+The project has completed its technical foundation and its first in-memory financial flow.
 
-- Cadastro mínimo de usuários com nome e email.
-- Normalização e unicidade do email cadastrado.
-- Criação automática de uma carteira BRL com saldo zero para cada usuário.
-- Inicialização da carteira interna `SYSTEM_TREASURY`.
-- Funding sandbox da tesouraria para carteiras de usuários.
-- Consulta de saldo de uma carteira.
-- Transferência entre carteiras de usuários.
-- Histórico operacional de movimentações concluídas.
-- Validação de valor positivo, saldo suficiente e transferência para carteira diferente da origem.
-- Persistência transacional quando a infraestrutura de banco de dados for introduzida.
+Currently implemented:
+- `Money` as a monetary Value Object
+- `Wallet` as a mutable in-memory balance holder
+- `SystemTreasury` as an explicit institutional funding source
+- `TreasuryFunding` as the first money movement operation
 
-## Decisões Atuais
+## Current Domain Model
 
-| Decisão | Justificativa |
-|---|---|
-| Java 21 como versão principal | Permite desenvolver o projeto sobre uma versão moderna da linguagem e consolidar práticas atuais do ecossistema Java. |
-| BRL como única moeda no MVP | Mantém o domínio inicial concentrado em movimentações, sem introduzir regras de câmbio ou conversão monetária. |
-| `Money` sem campo `currency` inicialmente | Como o MVP opera somente em BRL, armazenar a moeda no objeto de valor adicionaria complexidade sem necessidade imediata. |
-| Uma carteira por usuário | Reduz ambiguidades do domínio inicial e simplifica cadastro, consulta de saldo e transferências. |
-| `SYSTEM_TREASURY` como origem de fundos | Permite distribuir valores fictícios de maneira explícita e controlada, evitando criação de saldo sem origem modelada. |
-| Saldo persistido na carteira na primeira implementação | Mantém o primeiro ciclo pequeno e observável, permitindo compreender e testar o fluxo básico antes de adotar um modelo contábil mais sofisticado. |
-| Desenvolvimento incremental orientado por testes | Permite proteger comportamentos já definidos e refatorar o domínio com maior segurança à medida que novas necessidades surgirem. |
-| Ausência de autenticação no primeiro incremento local | O primeiro objetivo é consolidar as regras do domínio em ambiente controlado, antes de expor operações protegidas por identidade e autorização. |
+### `Money`
 
-## Limitações Aceitas
+`Money` represents monetary amounts.
 
-- O MVP inicial adotará o **saldo persistido na carteira** como fonte da verdade. Essa escolha reduz a complexidade do primeiro ciclo de desenvolvimento e poderá ser revisada quando auditoria detalhada ou reconstrução de saldo se tornarem requisitos relevantes.
-- O histórico inicial será um **histórico operacional de movimentações**, destinado a registrar operações concluídas. Ele não representará, nesta fase, um ledger contábil formal.
-- A primeira implementação não adotará **double-entry**. A modelagem de débitos e créditos balanceados será avaliada em uma evolução posterior do domínio financeiro.
-- O primeiro incremento local não terá autenticação ou autorização. Consequentemente, sua execução será restrita a ambiente de desenvolvimento e demonstração, sem pretensão de exposição pública segura.
-- O funding originado pela `SYSTEM_TREASURY` será exclusivamente um mecanismo sandbox para disponibilizar valores fictícios às carteiras de usuários.
-- O MVP não suportará múltiplas moedas, integração bancária, pagamentos reais ou qualquer movimentação de dinheiro real.
+Current responsibilities:
+- wrap `BigDecimal`
+- normalize values to two decimal places
+- reject real fractions of cents
+- reject `null`
+- allow zero and negative monetary values as representable amounts
+- support addition and subtraction
+- expose positivity and comparison operations needed by domain flows
 
-## Evoluções Planejadas
+`Money` does not decide whether a financial operation is valid. Operational rules belong to the domain behavior that performs the operation.
 
-Conforme o domínio amadurecer e novos requisitos forem justificados, o LedgerPay poderá evoluir para:
+### `Wallet`
 
-- Substituição do saldo persistido por um modelo de **ledger append-only** com **double-entry**, caso requisitos de auditoria e consistência financeira o demandem.
-- Introdução de idempotência para impedir processamento duplicado de transferências.
-- Testes de concorrência e definição de uma estratégia de locking quando operações simultâneas passarem a ser exercitadas.
-- Autenticação e autorização para proteger operações sobre carteiras antes de qualquer exposição além do ambiente local.
-- Inclusão futura de documento de usuário por migration, caso a evolução das regras de identificação torne esse dado necessário.
-- Implementação de outbox e notificações assíncronas após a consolidação do motor principal de transferências.
+`Wallet` represents a common wallet with a mutable in-memory balance.
+
+Current responsibilities:
+- start with zero balance
+- reject `null` initial balance
+- reject negative initial balance
+- allow positive credits
+- reject zero or negative credits
+- allow positive debits when balance is sufficient
+- reject zero or negative debits
+- reject debits above available balance
+- allow debiting the exact available balance
+
+`Wallet` is currently modeled with direct balance mutation. This is intentional for the current stage and may evolve when ledger-based accounting is introduced.
+
+### `SystemTreasury`
+
+`SystemTreasury` represents the system’s institutional funding source.
+
+Current responsibilities:
+- start with a fixed fictitious balance of `1.000.000.00`
+- expose its current balance
+- allow protected debit through its internal funds
+- act as the only valid source type for treasury funding
+
+`SystemTreasury` is implemented using composition rather than inheritance from `Wallet`.
+
+### `TreasuryFunding`
+
+`TreasuryFunding` represents the operation of funding a common wallet from the system treasury.
+
+Current responsibilities:
+- require `SystemTreasury` as the funding source
+- require a destination `Wallet`
+- require a positive `Money` amount
+- reject zero and negative funding amounts
+- reject funding above treasury funds
+- debit the treasury and credit the destination wallet
+
+## Current Technical Foundation
+
+The project currently uses:
+- Java 21
+- Maven
+- JUnit 5
+- AssertJ
+- Spotless
+- `google-java-format`
+- GitHub Codespaces with Java 21
+- optional Makefile shortcuts for local development
+
+## Validation Strategy
+
+The project uses unit tests to drive domain behavior.
+
+Current validation includes:
+- monetary invariants in `Money`
+- wallet balance rules in `Wallet`
+- treasury initialization in `SystemTreasury`
+- valid and invalid funding flows in `TreasuryFunding`
+- formatting validation through Spotless
+- full local validation through `make verify`
+
+## Current Scope
+
+The current scope includes:
+- in-memory domain modeling
+- monetary correctness for basic operations
+- wallet balance protection
+- treasury-based funding
+- automated tests for implemented behavior
+
+## Out of Scope for the Current Stage
+
+- REST API
+- Spring Boot application layer
+- PostgreSQL persistence
+- authentication
+- authorization
+- idempotency
+- distributed transactions
+- formal ledger
+- double-entry accounting
+- users and wallet ownership
+- production-grade treasury lifecycle management
+
+## Known Limitations
+
+- `Wallet.credit(...)` and `Wallet.debit(...)` are still publicly callable
+- `SystemTreasury.debit(...)` is still publicly callable
+- Multiple `SystemTreasury` instances can be created in memory
+- `Wallet(Money balance)` remains public while creation versus rehydration has not yet been formally modeled
+- Balances are stored directly instead of being derived from ledger entries
+- Domain errors still use generic Java exceptions
+
+These limitations are intentional at this stage and will be revisited when the project introduces additional flows, application services, persistence, or ledger modeling.
+
+## Immediate Roadmap
+
+### Peer Transfer Domain
+
+Expected concerns:
+- transferring a positive amount from one wallet to another
+- rejecting zero and negative transfer amounts
+- rejecting insufficient source balance
+- preventing transfers from a wallet to itself
+- preserving balances when a transfer is rejected
+- deciding whether wallet identity is needed now or later
+- observing the limits of direct balance mutation before introducing a ledger
+
+### Future Stages
+
+Later stages may include:
+- wallet identity
+- users and ownership
+- application services
+- domain-specific exceptions
+- persistence with PostgreSQL
+- REST API
+- idempotent operations
+- ledger entries
+- double-entry accounting
