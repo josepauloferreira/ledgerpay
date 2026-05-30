@@ -1,65 +1,82 @@
 # LedgerPay
 
-> Backend Java sandbox para carteiras digitais e transferências.
+> Java backend sandbox for digital wallets, money movement, and financial domain modeling.
 
-## Status atual
+## Current Status
 
-Fundação técnica concluída. O projeto iniciou a modelagem do domínio financeiro com o Value Object `Money` já integrado à branch principal.
+LedgerPay has completed its technical foundation and now includes its first in-memory financial flow: funding a wallet from an explicit `SystemTreasury`.
 
-## Documentação
+The project currently focuses on domain modeling, monetary correctness, unit testing, and incremental architecture. It does not yet include persistence, REST APIs, authentication, idempotency, or a formal ledger.
 
-- [Definição inicial do projeto](docs/00-project-definition.md)
+## Documentation
 
-## Stack atual
+- [Initial project definition](docs/00-project-definition.md)
+
+## Current Stack
 
 - Java 21
 - Maven
+- Maven Wrapper
 - JUnit 5
 - AssertJ
+- Spotless
+* `google-java-format`
 
-## Desenvolvimento com GitHub Codespaces
+## Development with GitHub Codespaces
 
-O repositório possui uma configuração de dev container com Java 21 para criar um ambiente de desenvolvimento reproduzível no GitHub Codespaces.
+The repository includes a dev container configuration with Java 21 to provide a reproducible development environment in GitHub Codespaces.
 
-## Como executar os testes
+## Running Tests
+
 ### Linux/macOS
 
 ```bash
 ./mvnw test
 ```
 
-###  Windows
+### Windows
 
 ```powershell
 .\mvnw.cmd test
 ```
 
-## Atalhos de desenvolvimento
+## Development Shortcuts
 
-Os comandos abaixo são atalhos opcionais para ambientes com `make` disponível. O Maven Wrapper permanece como forma canônica de executar o build e os testes do projeto.
+The commands below are optional shortcuts for environments with `make` available. The Maven Wrapper remains the canonical way to run the project build and tests.
 
-| Comando       | Descrição                                              |
-| ------------- | ------------------------------------------------------ |
-| `make help`   | Lista os atalhos disponíveis.                          |
-| `make test`   | Executa a suíte de testes.                             |
-| `make verify` | Executa a validação completa antes de review ou merge. |
-| `make clean`  | Remove os artefatos gerados pelo build.                |
-| `make format` | Aplica a formatação automática do código Java.         |
-| `make format-check` | Verifica se o código Java segue o padrão de formatação.         |
+| Command             | Description                                  |
+| ------------------- | -------------------------------------------- |
+| `make help`         | Lists available shortcuts.                   |
+| `make test`         | Runs the test suite.                         |
+| `make verify`       | Runs full validation before review or merge. |
+| `make clean`        | Removes Maven build artifacts.               |
+| `make format`       | Applies Java formatting.                     |
+| `make format-check` | Checks Java formatting.                      |
 
-## Qualidade automatizada
+## Automated Quality
 
-O projeto utiliza Spotless com `google-java-format` para manter a formatação do código Java consistente. A verificação de formatação é executada durante `make verify`.
+The project uses Spotless with `google-java-format` to keep Java formatting consistent. Formatting checks are executed during `make verify`.
 
-## Roadmap imediato
+## Implemented Domain
 
-- [x] Money Value Object
-- [ ] Funding via System Treasury em memória
-- [ ] Peer Transfer em memória
-- [ ] Persistência com Spring Boot e PostgreSQL
-- [ ] API REST sandbox
-- [ ] Evolução futura para ledger
+- [x] `Money` Value Object
+- [x] `Wallet` with protected in-memory balance operations
+- [x] `SystemTreasury` with fixed initial funds
+- [x] Treasury funding flow in memory
+- [ ] Peer transfer between wallets
+- [ ] Persistence with Spring Boot and PostgreSQL
+- [ ] REST API sandbox
+- [ ] Future evolution toward a formal ledger
 
-## Limitações atuais
+## Current Limitations
 
-No estado atual do projeto ainda não existem API, persistência, autenticação ou ledger formal.
+At the current stage, LedgerPay does not include:
+
+- REST API
+- persistence
+- authentication or authorization
+- idempotency
+- transaction boundaries
+- formal ledger or double-entry accounting
+
+The current model uses direct in-memory balances to support incremental domain learning before evolving toward more robust financial architecture.
