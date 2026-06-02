@@ -13,11 +13,11 @@ public record WalletId(String id) {
     }
   }
 
-  public WalletId() {
-    this(UUID.randomUUID().toString());
-  }
-
   public static WalletId of(String id) {
     return new WalletId(id);
+  }
+
+  public static WalletId newId() {
+    return new WalletId(UUID.randomUUID().toString());
   }
 }

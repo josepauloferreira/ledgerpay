@@ -45,7 +45,7 @@ class WalletIdTest {
 
   @Test
   void shouldCreateIdWhenUsingNoArgsConstructor() {
-    WalletId id = new WalletId();
+    WalletId id = WalletId.newId();
 
     assertThat(id).isNotNull();
   }

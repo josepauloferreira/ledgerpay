@@ -83,4 +83,55 @@ class WalletTest {
 
     assertThat(wallet.balance()).isEqualTo(Money.of("0.00"));
   }
+
+  @Test
+  void shouldGenerateWalletIdWhenUsingNoArgsConstructor() {
+    Wallet wallet = new Wallet();
+
+    assertThat(wallet.id()).isNotNull();
+  }
+
+  @Test
+  void shouldGenerateWalletIdWhenUsingExplicitBalance() {
+    Wallet wallet = new Wallet(Money.of("100.00"));
+
+    assertThat(wallet.id()).isNotNull();
+  }
+
+  @Test
+  void shouldPreserveExplicitWalletId() {
+    WalletId walletId = WalletId.of("wallet-1");
+    Money balance = Money.of("100.00");
+
+    Wallet wallet = new Wallet(walletId, balance);
+
+    assertThat(wallet.id()).isEqualTo(walletId);
+    assertThat(wallet.balance()).isEqualTo(balance);
+  }
+
+  @Test
+  void shouldRejectNullWalletIdWhenUsingExplicitConstructor() {
+    WalletId walletId = null;
+    Money balance = Money.of("0.00");
+
+    assertThatThrownBy(() -> new Wallet(walletId, balance))
+        .isInstanceOf(NullPointerException.class);
+  }
+
+  @Test
+  void shouldRejectNullBalanceWhenUsingExplicitConstructor() {
+    WalletId walletId = WalletId.newId();
+    Money balance = null;
+
+    assertThatThrownBy(() -> new Wallet(walletId, balance))
+        .isInstanceOf(NullPointerException.class);
+  }
+
+  @Test
+  void shouldRejectNegativeBalanceWhenUsingExplicitConstructor() {
+    Money balance = Money.of("-10.00");
+
+    assertThatThrownBy(() -> new Wallet(WalletId.newId(), balance))
+        .isInstanceOf(IllegalArgumentException.class);
+  }
 }

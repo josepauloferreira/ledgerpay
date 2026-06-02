@@ -5,23 +5,34 @@ import java.util.Objects;
 
 public class Wallet {
   private Money balance;
+  private final WalletId id;
+
+  public Wallet() {
+    this(WalletId.newId(), Money.of("0.00"));
+  }
 
   public Wallet(Money balance) {
+    this(WalletId.newId(), balance);
+  }
+
+  public Wallet(WalletId walletId, Money balance) {
+    Objects.requireNonNull(walletId);
     Objects.requireNonNull(balance);
 
     if (balance.isLessThan(Money.of("0.00"))) {
       throw new IllegalArgumentException();
     }
 
+    this.id = walletId;
     this.balance = balance;
-  }
-
-  public Wallet() {
-    this(Money.of("0.00"));
   }
 
   public Money balance() {
     return this.balance;
+  }
+
+  public WalletId id() {
+    return this.id;
   }
 
   public void credit(Money amount) {
