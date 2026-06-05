@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import io.github.phlmth.ledgerpay.domain.money.Money;
 import io.github.phlmth.ledgerpay.domain.wallet.Wallet;
+import io.github.phlmth.ledgerpay.domain.wallet.WalletId;
 import org.junit.jupiter.api.Test;
 
 class PeerTransferTest {
@@ -65,9 +66,10 @@ class PeerTransferTest {
   }
 
   @Test
-  void shouldRejectTransferFromSameWallet() {
-    Wallet source = new Wallet(Money.of("100.00"));
-    Wallet destination = source;
+  void shouldRejectTransferWhenWalletIdsAreEqual() {
+    WalletId id = WalletId.of("wallet-1");
+    Wallet source = new Wallet(id, Money.of("100.00"));
+    Wallet destination = new Wallet(id, Money.of("100.00"));
 
     PeerTransfer transfer = new PeerTransfer();
 

@@ -6,7 +6,7 @@ import io.github.phlmth.ledgerpay.domain.wallet.Wallet;
 public class PeerTransfer {
 
   public void execute(Wallet source, Wallet destination, Money amount) {
-    if (source == destination) {
+    if (source.id().equals(destination.id())) {
       throw new IllegalArgumentException();
     }
 
