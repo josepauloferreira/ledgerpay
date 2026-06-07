@@ -3,6 +3,8 @@ package io.github.phlmth.ledgerpay.domain.funding;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import io.github.phlmth.ledgerpay.domain.exception.InsufficientBalanceException;
+import io.github.phlmth.ledgerpay.domain.exception.InvalidMoneyMovementAmountException;
 import io.github.phlmth.ledgerpay.domain.money.Money;
 import io.github.phlmth.ledgerpay.domain.treasury.SystemTreasury;
 import io.github.phlmth.ledgerpay.domain.wallet.Wallet;
@@ -31,7 +33,7 @@ class TreasuryFundingTest {
     TreasuryFunding funding = new TreasuryFunding();
 
     assertThatThrownBy(() -> funding.execute(treasury, destination, amount))
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(InvalidMoneyMovementAmountException.class);
 
     assertThat(treasury.balance()).isEqualTo(Money.of("1000000.00"));
     assertThat(destination.balance()).isEqualTo(Money.of("0.00"));
@@ -45,7 +47,7 @@ class TreasuryFundingTest {
     TreasuryFunding funding = new TreasuryFunding();
 
     assertThatThrownBy(() -> funding.execute(treasury, destination, amount))
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(InvalidMoneyMovementAmountException.class);
 
     assertThat(treasury.balance()).isEqualTo(Money.of("1000000.00"));
     assertThat(destination.balance()).isEqualTo(Money.of("0.00"));
@@ -59,7 +61,7 @@ class TreasuryFundingTest {
     TreasuryFunding funding = new TreasuryFunding();
 
     assertThatThrownBy(() -> funding.execute(treasury, destination, amount))
-        .isInstanceOf(IllegalStateException.class);
+        .isInstanceOf(InsufficientBalanceException.class);
 
     assertThat(treasury.balance()).isEqualTo(Money.of("1000000.00"));
     assertThat(destination.balance()).isEqualTo(Money.of("0.00"));
