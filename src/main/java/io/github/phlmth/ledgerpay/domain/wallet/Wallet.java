@@ -1,5 +1,6 @@
 package io.github.phlmth.ledgerpay.domain.wallet;
 
+import io.github.phlmth.ledgerpay.domain.exception.InvalidWalletBalanceException;
 import io.github.phlmth.ledgerpay.domain.money.Money;
 import java.util.Objects;
 
@@ -20,7 +21,7 @@ public class Wallet {
     Objects.requireNonNull(balance);
 
     if (balance.isLessThan(Money.of("0.00"))) {
-      throw new IllegalArgumentException();
+      throw new InvalidWalletBalanceException("cannot be created with a negative balance");
     }
 
     this.id = walletId;

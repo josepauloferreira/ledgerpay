@@ -3,6 +3,7 @@ package io.github.phlmth.ledgerpay.domain.wallet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import io.github.phlmth.ledgerpay.domain.exception.InvalidWalletBalanceException;
 import io.github.phlmth.ledgerpay.domain.money.Money;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +24,7 @@ class WalletTest {
   @Test
   void shouldRejectNegativeInitialBalance() {
     assertThatThrownBy(() -> new Wallet(Money.of("-10.00")))
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(InvalidWalletBalanceException.class);
   }
 
   @Test
@@ -130,8 +131,7 @@ class WalletTest {
   @Test
   void shouldRejectNegativeBalanceWhenUsingExplicitConstructor() {
     Money balance = Money.of("-10.00");
-
     assertThatThrownBy(() -> new Wallet(WalletId.newId(), balance))
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(InvalidWalletBalanceException.class);
   }
 }
