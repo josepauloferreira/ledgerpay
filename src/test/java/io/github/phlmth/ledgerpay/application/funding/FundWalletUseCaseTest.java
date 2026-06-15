@@ -29,6 +29,11 @@ class FundWalletUseCaseTest {
     assertThat(wallet.balance()).isEqualTo(Money.of("100.00"));
     assertThat(treasury.balance()).isEqualTo(Money.of("999900.00"));
     assertThat(movement.type()).isEqualTo(MoneyMovementType.TREASURY_FUNDING);
+    assertThat(movement.source().isSystemTreasury()).isTrue();
+    assertThat(movement.destination().walletId()).isEqualTo(wallet.id());
+    assertThat(movement.amount()).isEqualTo(amount);
+    assertThat(movement.occurredAt()).isEqualTo(occurredAt);
+
     assertThat(history.movements()).containsExactly(movement);
   }
 
@@ -36,9 +41,9 @@ class FundWalletUseCaseTest {
   void shouldNotRecordMoneyMovementWhenFundingAmountIsInvalid() {
     SystemTreasury treasury = new SystemTreasury();
     Wallet wallet = new Wallet();
-    MoneyMovementHistory history = new MoneyMovementHistory();
     Money amount = Money.of("0.00");
     Instant occurredAt = Instant.parse("2026-06-10T12:00:00Z");
+    MoneyMovementHistory history = new MoneyMovementHistory();
 
     FundWalletUseCase useCase = new FundWalletUseCase(history);
 

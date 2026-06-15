@@ -4,6 +4,9 @@ import io.github.phlmth.ledgerpay.domain.funding.TreasuryFunding;
 import io.github.phlmth.ledgerpay.domain.money.Money;
 import io.github.phlmth.ledgerpay.domain.movement.MoneyMovement;
 import io.github.phlmth.ledgerpay.domain.movement.MoneyMovementHistory;
+import io.github.phlmth.ledgerpay.domain.movement.MoneyMovementId;
+import io.github.phlmth.ledgerpay.domain.movement.MoneyMovementParticipant;
+import io.github.phlmth.ledgerpay.domain.movement.MoneyMovementType;
 import io.github.phlmth.ledgerpay.domain.treasury.SystemTreasury;
 import io.github.phlmth.ledgerpay.domain.wallet.Wallet;
 import java.time.Instant;
@@ -20,10 +23,21 @@ public class FundWalletUseCase {
 
   public MoneyMovement fund(
       SystemTreasury treasury, Wallet wallet, Money amount, Instant occurredAt) {
-    int nextMovementIndex = history.movements().size();
 
-    treasuryFunding.execute(treasury, wallet, amount, history, occurredAt);
+    Objects.requireNonNull(occurredAt);
 
-    return history.movements().get(nextMovementIndex);
+    treasuryFunding.execute(treasury, wallet, amount);
+
+    MoneyMovement movement =
+        new MoneyMovement(
+            MoneyMovementId.newId(),
+            MoneyMovementType.TREASURY_FUNDING,
+            MoneyMovementParticipant.systemTreasury(),
+            MoneyMovementParticipant.wallet(wallet.id()),
+            amount,
+            occurredAt);
+
+    history.record(movement);
+    return movement;
   }
 }
