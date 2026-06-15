@@ -29,6 +29,10 @@ class TransferMoneyUseCaseTest {
     assertThat(destination.balance()).isEqualTo(Money.of("60.00"));
     assertThat(movement.type()).isEqualTo(MoneyMovementType.PEER_TRANSFER);
     assertThat(history.movements()).containsExactly(movement);
+    assertThat(movement.source().walletId()).isEqualTo(source.id());
+    assertThat(movement.destination().walletId()).isEqualTo(destination.id());
+    assertThat(movement.amount()).isEqualTo(amount);
+    assertThat(movement.occurredAt()).isEqualTo(occurredAt);
   }
 
   @Test
