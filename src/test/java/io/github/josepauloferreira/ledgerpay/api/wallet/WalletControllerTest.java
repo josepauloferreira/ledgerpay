@@ -1,8 +1,11 @@
 package io.github.josepauloferreira.ledgerpay.api.wallet;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -26,6 +29,8 @@ class WalletControllerTest {
     mockMvc
         .perform(post("/wallets"))
         .andExpect(status().isCreated())
+        .andExpect(header().exists(LOCATION))
+        .andExpect(header().string(LOCATION, containsString("/wallets/")))
         .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.id").isNotEmpty())
         .andExpect(jsonPath("$.balance").value("0.00"));
@@ -48,9 +53,6 @@ class WalletControllerTest {
 
   @Test
   void shouldReturnNotFoundWhenWalletDoesNotExist() throws Exception {
-    mockMvc
-      .perform(get("/wallets/{id}", "unknow-wallet-id"))
-      .andExpect(status().isNotFound());
-
+    mockMvc.perform(get("/wallets/{id}", "unknow-wallet-id")).andExpect(status().isNotFound());
   }
 }
