@@ -53,6 +53,31 @@ class WalletControllerTest {
 
   @Test
   void shouldReturnNotFoundWhenWalletDoesNotExist() throws Exception {
-    mockMvc.perform(get("/wallets/{id}", "unknow-wallet-id")).andExpect(status().isNotFound());
+    mockMvc.perform(get("/wallets/{id}", "unknown-wallet-id")).andExpect(status().isNotFound());
+  }
+
+  @Test
+  void shouldFundWallet() throws Exception {
+    MvcResult createResult =
+        mockMvc.perform(post("/wallets")).andExpect(status().isCreated()).andReturn();
+
+    String walletId = JsonPath.read(createResult.getResponse().getContentAsString(), "$.id");
+
+    String body =
+        """
+        {
+          "amount": "100.00"
+        }
+        """;
+
+    mockMvc
+        .perform(
+            post("/wallets/{id}/funding", walletId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+        .andExpect(status().isOk())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.id").value(walletId))
+        .andExpect(jsonPath("$.balance").value("100.00"));
   }
 }
