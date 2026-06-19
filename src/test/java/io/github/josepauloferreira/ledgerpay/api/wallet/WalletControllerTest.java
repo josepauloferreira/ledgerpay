@@ -80,4 +80,21 @@ class WalletControllerTest {
         .andExpect(jsonPath("$.id").value(walletId))
         .andExpect(jsonPath("$.balance").value("100.00"));
   }
+
+  @Test
+  void shouldReturnNotFoundWhenFundingWalletDoesNotExist() throws Exception {
+    String body =
+        """
+      {
+        "amount": "100.00"
+      }
+      """;
+
+    mockMvc
+        .perform(
+            post("/wallets/{id}/funding", "unknown-wallet-id")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+        .andExpect(status().isNotFound());
+  }
 }
