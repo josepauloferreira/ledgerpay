@@ -5,6 +5,7 @@ import io.github.josepauloferreira.ledgerpay.domain.money.Money;
 import io.github.josepauloferreira.ledgerpay.domain.treasury.SystemTreasury;
 import io.github.josepauloferreira.ledgerpay.domain.wallet.Wallet;
 import io.github.josepauloferreira.ledgerpay.infra.memory.WalletStore;
+import jakarta.validation.Valid;
 import java.time.Instant;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,7 +61,7 @@ public class WalletController {
 
   @PostMapping("/{id}/funding")
   public WalletResponse fundWallet(
-      @PathVariable String id, @RequestBody FundWalletRequest request) {
+      @PathVariable String id, @RequestBody @Valid FundWalletRequest request) {
     var wallet = findWalletOrThrow(id);
 
     var amount = Money.of(request.amount());

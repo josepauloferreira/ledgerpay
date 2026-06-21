@@ -1,3 +1,5 @@
 package io.github.josepauloferreira.ledgerpay.api.wallet;
 
-public record FundWalletRequest(String amount) {}
+import jakarta.validation.constraints.NotBlank;
+
+public record FundWalletRequest(@NotBlank String amount) {}

@@ -121,27 +121,44 @@ class WalletControllerTest {
         .andExpect(status().isBadRequest());
   }
 
-
   @Test
   void shouldReturnBadRequestWhenFundingAmountIsNegative() throws Exception {
 
     MvcResult createResult =
-      mockMvc.perform(post("/wallets")).andExpect(status().isCreated()).andReturn();
+        mockMvc.perform(post("/wallets")).andExpect(status().isCreated()).andReturn();
 
     String walletId = JsonPath.read(createResult.getResponse().getContentAsString(), "$.id");
 
     String body =
-      """
+        """
     {
       "amount": "-1.00"
     }
     """;
 
     mockMvc
-      .perform(
-        post("/wallets/{id}/funding", walletId)
-          .contentType(MediaType.APPLICATION_JSON)
-          .content(body))
-      .andExpect(status().isBadRequest());
+        .perform(
+            post("/wallets/{id}/funding", walletId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void shouldReturnBadRequestWhenFundingAmountIsMissing() throws Exception {
+
+    MvcResult createResult =
+        mockMvc.perform(post("/wallets")).andExpect(status().isCreated()).andReturn();
+
+    String walletId = JsonPath.read(createResult.getResponse().getContentAsString(), "$.id");
+
+    String body = "{}";
+
+    mockMvc
+        .perform(
+            post("/wallets/{id}/funding", walletId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+        .andExpect(status().isBadRequest());
   }
 }
