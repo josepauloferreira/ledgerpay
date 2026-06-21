@@ -97,4 +97,27 @@ class WalletControllerTest {
                 .content(body))
         .andExpect(status().isNotFound());
   }
+
+  @Test
+  void shouldReturnBadRequestWhenFundingAmountIsZero() throws Exception {
+
+    MvcResult createResult =
+        mockMvc.perform(post("/wallets")).andExpect(status().isCreated()).andReturn();
+
+    String walletId = JsonPath.read(createResult.getResponse().getContentAsString(), "$.id");
+
+    String body =
+        """
+      {
+        "amount": "0.00"
+      }
+      """;
+
+    mockMvc
+        .perform(
+            post("/wallets/{id}/funding", walletId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+        .andExpect(status().isBadRequest());
+  }
 }
