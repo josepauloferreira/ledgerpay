@@ -229,6 +229,21 @@ class WalletControllerTest {
         .andExpect(status().isNotFound());
   }
 
+  @Test
+  void shouldReturnBadRequestWhenTransferringToSameWallet() throws Exception {
+    String sourceId = createWallet();
+    String targetId = sourceId;
+
+    fundWallet(sourceId, "100.00", "100.00");
+
+    mockMvc
+        .perform(
+            post("/wallets/{id}/transfers", sourceId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(transferBody(targetId, "40.00")))
+        .andExpect(status().isBadRequest());
+  }
+
   private String transferBody(String targetId, String amount) {
     return """
       {
