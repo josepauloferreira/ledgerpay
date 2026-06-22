@@ -1,6 +1,7 @@
 package io.github.josepauloferreira.ledgerpay.api.wallet;
 
 import io.github.josepauloferreira.ledgerpay.application.funding.FundWalletUseCase;
+import io.github.josepauloferreira.ledgerpay.application.transfer.TransferMoneyUseCase;
 import io.github.josepauloferreira.ledgerpay.domain.money.Money;
 import io.github.josepauloferreira.ledgerpay.domain.treasury.SystemTreasury;
 import io.github.josepauloferreira.ledgerpay.domain.wallet.Wallet;
@@ -25,6 +26,7 @@ public class WalletController {
   private final WalletStore store;
   private final FundWalletUseCase fundWalletUseCase;
   private final SystemTreasury treasury;
+  private final TransferMoneyUseCase transferMoneyUseCase;
 
   private WalletResponse toResponse(Wallet wallet) {
     return new WalletResponse(wallet.id().toString(), wallet.balance().amount().toPlainString());
@@ -35,10 +37,14 @@ public class WalletController {
   }
 
   public WalletController(
-      WalletStore store, FundWalletUseCase fundWalletUseCase, SystemTreasury treasury) {
+      WalletStore store,
+      FundWalletUseCase fundWalletUseCase,
+      SystemTreasury treasury,
+      TransferMoneyUseCase transferMoneyUseCase) {
     this.store = store;
     this.fundWalletUseCase = fundWalletUseCase;
     this.treasury = treasury;
+    this.transferMoneyUseCase = transferMoneyUseCase;
   }
 
   @PostMapping
@@ -68,5 +74,18 @@ public class WalletController {
     fundWalletUseCase.fund(treasury, wallet, amount, Instant.now());
 
     return toResponse(wallet);
+  }
+
+  @PostMapping("/{id}/transfers")
+  public TransferMoneyResponse transferMoney(
+      @PathVariable String id, @RequestBody @Valid TransferMoneyRequest request) {
+    var source = findWalletOrThrow(id);
+    var target = findWalletOrThrow(request.targetWalletId());
+
+    var amount = Money.of(request.amount());
+
+    transferMoneyUseCase.transfer(source, target, amount, Instant.now());
+
+    return new TransferMoneyResponse(toResponse(source), toResponse(target));
   }
 }
