@@ -217,6 +217,18 @@ class WalletControllerTest {
         .andExpect(status().isNotFound());
   }
 
+  @Test
+  void shouldReturnNotFoundWhenTargetWalletDoesNotExist() throws Exception {
+    String sourceId = createWallet();
+
+    mockMvc
+        .perform(
+            post("/wallets/{id}/transfers", sourceId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(transferBody("unknown-wallet-id", "40.00")))
+        .andExpect(status().isNotFound());
+  }
+
   private String transferBody(String targetId, String amount) {
     return """
       {
