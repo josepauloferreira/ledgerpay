@@ -244,6 +244,19 @@ class WalletControllerTest {
         .andExpect(status().isBadRequest());
   }
 
+  @Test
+  void shouldReturnBadRequestWhenSourceHasInsufficientBalance() throws Exception {
+    String sourceId = createWallet();
+    String targetId = createWallet();
+
+    mockMvc
+        .perform(
+            post("/wallets/{id}/transfers", sourceId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(transferBody(targetId, "40.00")))
+        .andExpect(status().isBadRequest());
+  }
+
   private String transferBody(String targetId, String amount) {
     return """
       {
