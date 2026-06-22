@@ -4,7 +4,6 @@ import static org.hamcrest.Matchers.containsString;
 import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -198,13 +197,24 @@ class WalletControllerTest {
             post("/wallets/{id}/transfers", sourceId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(transferBody(targetId, "40.00")))
-        .andDo(print())
         .andExpect(status().isOk())
         .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.source.id").value(sourceId))
         .andExpect(jsonPath("$.source.balance").value("60.00"))
         .andExpect(jsonPath("$.target.id").value(targetId))
         .andExpect(jsonPath("$.target.balance").value("40.00"));
+  }
+
+  @Test
+  void shouldReturnNotFoundWhenSourceWalletDoesNotExist() throws Exception {
+    String targetId = createWallet();
+
+    mockMvc
+        .perform(
+            post("/wallets/{id}/transfers", "unknown-wallet-id")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(transferBody(targetId, "40.00")))
+        .andExpect(status().isNotFound());
   }
 
   private String transferBody(String targetId, String amount) {
