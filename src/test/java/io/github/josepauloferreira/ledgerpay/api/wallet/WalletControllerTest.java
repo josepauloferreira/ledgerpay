@@ -257,6 +257,25 @@ class WalletControllerTest {
         .andExpect(status().isBadRequest());
   }
 
+  @Test
+  void shouldReturnBadRequestWhenTransferTargetWalletIdIsMissing() throws Exception {
+    String sourceId = createWallet();
+
+    String body =
+        """
+      {
+        "amount": "40.00"
+      }
+      """;
+
+    mockMvc
+        .perform(
+            post("/wallets/{id}/transfers", sourceId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+        .andExpect(status().isBadRequest());
+  }
+
   private String transferBody(String targetId, String amount) {
     return """
       {
