@@ -276,6 +276,19 @@ class WalletControllerTest {
         .andExpect(status().isBadRequest());
   }
 
+  @Test
+  void shouldReturnBadRequestWhenTransferAmountIsNotNumeric() throws Exception {
+    String sourceId = createWallet();
+    String targetId = createWallet();
+
+    mockMvc
+        .perform(
+            post("/wallets/{id}/transfers", sourceId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(transferBody(targetId, "abc")))
+        .andExpect(status().isBadRequest());
+  }
+
   private String transferBody(String targetId, String amount) {
     return """
       {
