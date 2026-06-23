@@ -206,7 +206,7 @@ class WalletControllerTest {
   }
 
   @Test
-  void shouldReturnNotFoundWhenSourceWalletDoesNotExist() throws Exception {
+  void shouldReturnNotFoundWhenTransferSourceWalletDoesNotExist() throws Exception {
     String targetId = createWallet();
 
     mockMvc
@@ -218,7 +218,7 @@ class WalletControllerTest {
   }
 
   @Test
-  void shouldReturnNotFoundWhenTargetWalletDoesNotExist() throws Exception {
+  void shouldReturnNotFoundWhenTransferTargetWalletDoesNotExist() throws Exception {
     String sourceId = createWallet();
 
     mockMvc
@@ -230,7 +230,7 @@ class WalletControllerTest {
   }
 
   @Test
-  void shouldReturnBadRequestWhenTransferringToSameWallet() throws Exception {
+  void shouldReturnBadRequestWhenTransferTargetsSameWallet() throws Exception {
     String sourceId = createWallet();
     String targetId = sourceId;
 
@@ -245,7 +245,7 @@ class WalletControllerTest {
   }
 
   @Test
-  void shouldReturnBadRequestWhenSourceHasInsufficientBalance() throws Exception {
+  void shouldReturnBadRequestWhenTransferBalanceIsInsufficient() throws Exception {
     String sourceId = createWallet();
     String targetId = createWallet();
 
@@ -277,7 +277,7 @@ class WalletControllerTest {
   }
 
   @Test
-  void shouldReturnBadRequestWhenTransferAmountIsNotNumeric() throws Exception {
+  void shouldReturnBadRequestWhenTransferAmountIsInvalid() throws Exception {
     String sourceId = createWallet();
     String targetId = createWallet();
 
