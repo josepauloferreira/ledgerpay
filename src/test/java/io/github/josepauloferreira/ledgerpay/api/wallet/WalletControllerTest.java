@@ -53,7 +53,11 @@ class WalletControllerTest {
 
   @Test
   void shouldReturnNotFoundWhenWalletDoesNotExist() throws Exception {
-    mockMvc.perform(get("/wallets/{id}", "unknown-wallet-id")).andExpect(status().isNotFound());
+    mockMvc
+        .perform(get("/wallets/{id}", "unknown-wallet-id"))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.error").value("not_found"))
+        .andExpect(jsonPath("$.message").value("Wallet not found."));
   }
 
   @Test
@@ -95,7 +99,9 @@ class WalletControllerTest {
             post("/wallets/{id}/funding", "unknown-wallet-id")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body))
-        .andExpect(status().isNotFound());
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.error").value("not_found"))
+        .andExpect(jsonPath("$.message").value("Wallet not found."));
   }
 
   @Test
@@ -118,7 +124,9 @@ class WalletControllerTest {
             post("/wallets/{id}/funding", walletId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body))
-        .andExpect(status().isBadRequest());
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("domain_error"))
+        .andExpect(jsonPath("$.message").value("The requested operation violates a domain rule."));
   }
 
   @Test
@@ -159,7 +167,9 @@ class WalletControllerTest {
             post("/wallets/{id}/funding", walletId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body))
-        .andExpect(status().isBadRequest());
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("bad_request"))
+        .andExpect(jsonPath("$.message").value("Request validation failed."));
   }
 
   @Test
@@ -214,7 +224,9 @@ class WalletControllerTest {
             post("/wallets/{id}/transfers", "unknown-wallet-id")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(transferBody(targetId, "40.00")))
-        .andExpect(status().isNotFound());
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.error").value("not_found"))
+        .andExpect(jsonPath("$.message").value("Wallet not found."));
   }
 
   @Test
@@ -226,7 +238,9 @@ class WalletControllerTest {
             post("/wallets/{id}/transfers", sourceId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(transferBody("unknown-wallet-id", "40.00")))
-        .andExpect(status().isNotFound());
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.error").value("not_found"))
+        .andExpect(jsonPath("$.message").value("Wallet not found."));
   }
 
   @Test
