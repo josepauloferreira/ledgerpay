@@ -12,7 +12,7 @@ public class WalletStore {
 
   public Wallet create() {
     Wallet wallet = new Wallet();
-    store.put(wallet.id().toString(), wallet);
+    store.put(wallet.id().id(), wallet);
     return wallet;
   }
 
