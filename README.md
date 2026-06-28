@@ -1,6 +1,6 @@
 # LedgerPay
 
-<p align="center">
+<p>
   <a href="https://github.com/josepauloferreira/ledgerpay/actions/workflows/ci.yml">
     <img src="https://github.com/josepauloferreira/ledgerpay/actions/workflows/ci.yml/badge.svg" alt="CI"/>
   </a>
@@ -10,80 +10,77 @@
   <img src="https://img.shields.io/badge/status-active-success" alt="Project status"/>
 </p>
 
-<p align="center">
-  Java/Spring Boot backend for modeling digital wallets, treasury funding, peer-to-peer transfers, and financial domain rules.
-</p>
-
----
+Java/Spring Boot backend for modeling digital wallets, treasury funding, peer-to-peer transfers, and financial domain rules.
 
 ## Overview
 
 LedgerPay is a backend project built to explore financial-domain modeling with Java and Spring Boot.
 
-The project currently exposes a REST API for creating wallets, funding wallets from a system treasury, and transferring money between wallets.
+The project currently exposes a REST API for creating wallets, funding wallets from a system treasury, transferring money between wallets, and listing recorded money movements.
 
-## Current capabilities
+## What it does today
 
-- Create wallets with an initial `0.00` balance.
-- Retrieve wallets by id.
-- Fund wallets from a system treasury.
-- Transfer money between wallets.
-- Validate request payloads at the API boundary.
-- Enforce financial rules in the domain layer.
-- Keep an in-memory record of successful money movements.
-- Run automated validation through Maven and GitHub Actions CI.
+* Create wallets with an initial `0.00` balance.
+* Retrieve wallets by id.
+* Fund wallets from a system treasury.
+* Transfer money between wallets.
+* Keep and expose an in-memory record of successful money movements.
+* Validate request payloads at the API boundary.
+* Return standardized JSON error responses for validation, domain, and not-found failures.
+* Enforce financial rules in the domain layer.
+* Run automated validation through Maven and GitHub Actions CI.
 
 ## Tech stack
 
-| Area | Technology |
-|---|---|
-| Language | Java 21 |
-| Framework | Spring Boot 3.5 |
-| Build | Maven Wrapper |
-| API | Spring Web |
-| Validation | Bean Validation |
-| Tests | JUnit 5, AssertJ, MockMvc |
-| Formatting | Spotless, google-java-format |
-| CI | GitHub Actions |
-| Current storage | In-memory |
+| Area            | Technology                   |
+| --------------- | ---------------------------- |
+| Language        | Java 21                      |
+| Framework       | Spring Boot 3.5              |
+| Build           | Maven Wrapper                |
+| API             | Spring Web                   |
+| Validation      | Bean Validation              |
+| Tests           | JUnit 5, AssertJ, MockMvc    |
+| Formatting      | Spotless, google-java-format |
+| CI              | GitHub Actions               |
+| Current storage | In-memory                    |
 
-## Project structure
+## Getting started
 
-```text
-src/main/java/io/github/josepauloferreira/ledgerpay
-├── api
-│   └── HTTP controllers, request DTOs, response DTOs, and API error handling
-├── application
-│   └── use cases that coordinate financial operations
-├── domain
-│   └── value objects, entities, domain services, and domain exceptions
-└── infra
-    └── in-memory storage and application configuration
+### Requirements
+
+* Java 21
+* Git
+
+### Running locally
+
+Clone and run:
+
+```bash
+git clone https://github.com/josepauloferreira/ledgerpay.git
+cd ledgerpay
+./mvnw spring-boot:run
 ```
 
-Current dependency direction:
+The API starts at:
 
 ```text
-HTTP layer → application use case → domain service → domain model
+http://localhost:8080
 ```
 
-Controllers handle HTTP concerns. Use cases coordinate application flows. The domain layer owns financial rules and does not depend on Spring.
+### Configuration
 
-## Core concepts
+LedgerPay currently runs with the default Spring Boot configuration.
 
-| Concept | Responsibility |
-|---|---|
-| `Money` | Represents monetary values with fixed decimal scale and arithmetic behavior. |
-| `Wallet` | Represents a wallet with identity and balance rules. |
-| `SystemTreasury` | Represents the institutional source used to fund wallets. |
-| `TreasuryFunding` | Applies domain rules for treasury-to-wallet funding. |
-| `PeerTransfer` | Applies domain rules for wallet-to-wallet transfers. |
-| `MoneyMovement` | Represents a completed financial movement. |
-| `MoneyMovementHistory` | Keeps an in-memory record of successful financial movements. |
-| `FundWalletUseCase` | Coordinates funding and records the resulting movement. |
-| `TransferMoneyUseCase` | Coordinates peer transfers and records the resulting movement. |
+No external services are required at this stage:
 
-## API
+* no database;
+* no Docker Compose;
+* no message broker;
+* no environment variables required for local execution.
+
+The current storage is in memory, so application state is reset when the process stops.
+
+## API reference
 
 ### Create wallet
 
@@ -111,9 +108,9 @@ Location: /wallets/{id}
 GET /wallets/{id}
 ```
 
-| Status | Meaning |
-|---|---|
-| `200 OK` | Wallet found. |
+| Status          | Meaning                |
+| --------------- | ---------------------- |
+| `200 OK`        | Wallet found.          |
 | `404 Not Found` | Wallet does not exist. |
 
 ### Fund wallet
@@ -131,13 +128,20 @@ Request:
 }
 ```
 
-| Status | Meaning |
-|---|---|
-| `200 OK` | Wallet funded successfully. |
-| `400 Bad Request` | Missing, invalid, zero, or negative amount. |
-| `404 Not Found` | Wallet does not exist. |
+Response:
 
-Returns the updated wallet.
+```json
+{
+  "id": "wallet-id",
+  "balance": "100.00"
+}
+```
+
+| Status            | Meaning                                     |
+| ----------------- | ------------------------------------------- |
+| `200 OK`          | Wallet funded successfully.                 |
+| `400 Bad Request` | Missing, invalid, zero, or negative amount. |
+| `404 Not Found`   | Wallet does not exist.                      |
 
 ### Transfer between wallets
 
@@ -170,45 +174,86 @@ Response:
 }
 ```
 
-| Status | Meaning |
-|---|---|
-| `200 OK` | Transfer completed. |
+| Status            | Meaning                                                                           |
+| ----------------- | --------------------------------------------------------------------------------- |
+| `200 OK`          | Transfer completed.                                                               |
 | `400 Bad Request` | Invalid request, same-wallet transfer, insufficient balance, or domain rejection. |
-| `404 Not Found` | Source or target wallet does not exist. |
+| `404 Not Found`   | Source or target wallet does not exist.                                           |
 
-## Running locally
+### List money movements
 
-Requirements:
-
-- Java 21
-- Git
-
-Clone and run:
-
-```bash
-git clone https://github.com/josepauloferreira/ledgerpay.git
-cd ledgerpay
-./mvnw spring-boot:run
+```http
+GET /movements
 ```
 
-The API starts at:
+Returns the recorded money movements in insertion order.
 
-```text
-http://localhost:8080
+Treasury funding movement response:
+
+```json
+[
+  {
+    "id": "movement-id",
+    "type": "TREASURY_FUNDING",
+    "source": {
+      "type": "SYSTEM_TREASURY",
+      "walletId": null
+    },
+    "destination": {
+      "type": "WALLET",
+      "walletId": "wallet-id"
+    },
+    "amount": "100.00",
+    "occurredAt": "2026-06-28T18:57:03Z"
+  }
+]
 ```
 
-## Configuration
+Peer transfer movement response:
 
-LedgerPay currently runs with the default Spring Boot configuration.
+```json
+[
+  {
+    "id": "movement-id",
+    "type": "PEER_TRANSFER",
+    "source": {
+      "type": "WALLET",
+      "walletId": "source-wallet-id"
+    },
+    "destination": {
+      "type": "WALLET",
+      "walletId": "target-wallet-id"
+    },
+    "amount": "40.00",
+    "occurredAt": "2026-06-28T18:57:03Z"
+  }
+]
+```
 
-No external services are required at this stage:
+| Status   | Meaning                              |
+| -------- | ------------------------------------ |
+| `200 OK` | Money movements listed successfully. |
 
-- no database;
-- no Docker Compose;
-- no message broker;
-- no environment variables required for local execution.
+### Error responses
 
-The current storage is in memory, so application state is reset when the process stops.
+LedgerPay returns standardized JSON error responses for API validation failures, domain rule violations, and missing resources.
+
+Example:
+
+```json
+{
+  "error": "bad_request",
+  "message": "Request validation failed."
+}
+```
+
+Current error categories include:
+
+| Error          | Meaning                                                               |
+| -------------- | --------------------------------------------------------------------- |
+| `bad_request`  | The request payload is missing required fields or has invalid format. |
+| `domain_error` | The request violates a financial domain rule.                         |
+| `not_found`    | The requested resource does not exist.                                |
 
 ## Example requests
 
@@ -240,6 +285,63 @@ curl -i -X POST http://localhost:8080/wallets/{sourceWalletId}/transfers \
   -d '{"targetWalletId":"{targetWalletId}","amount":"40.00"}'
 ```
 
+List money movements:
+
+```bash
+curl -i http://localhost:8080/movements
+```
+
+## Architecture
+
+### Project structure
+
+```text
+src/main/java/io/github/josepauloferreira/ledgerpay
+├── api
+│   └── HTTP controllers, request DTOs, response DTOs, and API error handling
+├── application
+│   └── use cases that coordinate financial operations
+├── domain
+│   └── value objects, entities, domain services, and domain exceptions
+└── infra
+    └── in-memory storage and application configuration
+```
+
+### Dependency direction
+
+```text
+HTTP layer → application use case → domain service → domain model
+```
+
+Controllers handle HTTP concerns. Use cases coordinate application flows. The domain layer owns financial rules and does not depend on Spring.
+
+### Core concepts
+
+| Concept                | Responsibility                                                               |
+| ---------------------- | ---------------------------------------------------------------------------- |
+| `Money`                | Represents monetary values with fixed decimal scale and arithmetic behavior. |
+| `Wallet`               | Represents a wallet with identity and balance rules.                         |
+| `SystemTreasury`       | Represents the institutional source used to fund wallets.                    |
+| `TreasuryFunding`      | Applies domain rules for treasury-to-wallet funding.                         |
+| `PeerTransfer`         | Applies domain rules for wallet-to-wallet transfers.                         |
+| `MoneyMovement`        | Represents a completed financial movement.                                   |
+| `MoneyMovementHistory` | Keeps an in-memory record of successful financial movements.                 |
+| `FundWalletUseCase`    | Coordinates funding and records the resulting movement.                      |
+| `TransferMoneyUseCase` | Coordinates peer transfers and records the resulting movement.               |
+
+### Architecture decisions
+
+| Decision                                 | Rationale                                                                                    |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Domain-first model                       | Keeps financial rules independent from Spring and HTTP.                                      |
+| Use cases between API and domain         | Prevents controllers from owning business orchestration.                                     |
+| Spring-free domain layer                 | Keeps the core model testable without framework infrastructure.                              |
+| In-memory storage                        | Allows API and domain boundaries to stabilize before persistence.                            |
+| Bean Validation at the API boundary      | Rejects malformed input before conversion into domain objects.                               |
+| API response DTOs                        | Keep public JSON contracts stable and avoid exposing domain object structure directly.       |
+| Manual mapping for small DTO projections | Keeps the current API boundary explicit without introducing mapper dependencies prematurely. |
+| Minimal CI                               | Mirrors the current quality contract without adding release or deployment complexity.        |
+
 ## Testing and validation
 
 Run the full validation pipeline:
@@ -256,48 +358,59 @@ make verify
 
 Useful commands:
 
-| Command | Description |
-|---|---|
-| `make test` | Runs the test suite. |
-| `make verify` | Runs the full validation pipeline. |
-| `make format` | Applies Java formatting. |
+| Command             | Description                                |
+| ------------------- | ------------------------------------------ |
+| `make test`         | Runs the test suite.                       |
+| `make verify`       | Runs the full validation pipeline.         |
+| `make format`       | Applies Java formatting.                   |
 | `make format-check` | Checks formatting without modifying files. |
-| `make clean` | Removes build artifacts. |
+| `make clean`        | Removes build artifacts.                   |
 
 The test suite currently covers:
 
-- monetary invariants and arithmetic;
-- wallet identity and balance rules;
-- treasury funding;
-- peer transfers;
-- money movement history;
-- application use cases;
-- Spring Boot context loading;
-- HTTP wallet creation and lookup;
-- HTTP funding and transfer flows;
-- `400 Bad Request` and `404 Not Found` scenarios.
+* monetary invariants and arithmetic;
+* wallet identity and balance rules;
+* treasury funding;
+* peer transfers;
+* money movement history;
+* application use cases;
+* Spring Boot context loading;
+* HTTP wallet creation and lookup;
+* HTTP funding and transfer flows;
+* HTTP money movement listing;
+* domain-to-response projection for movement history;
+* standardized API error responses;
+* `400 Bad Request` and `404 Not Found` scenarios.
 
 GitHub Actions runs `./mvnw clean verify` on pull requests and pushes to `main`.
 
-## Architecture decisions
-
-| Decision | Rationale |
-|---|---|
-| Domain-first model | Keeps financial rules independent from Spring and HTTP. |
-| Use cases between API and domain | Prevents controllers from owning business orchestration. |
-| Spring-free domain layer | Keeps the core model testable without framework infrastructure. |
-| In-memory storage | Allows API and domain boundaries to stabilize before persistence. |
-| Bean Validation at the API boundary | Rejects malformed input before conversion into domain objects. |
-| Minimal CI | Mirrors the current quality contract without adding release or deployment complexity. |
-
 ## Roadmap
 
-- [ ] Standardize API error response bodies.
-- [ ] Expose money movement history through the API.
+### Implemented
+
+- [x] Model monetary values with domain invariants.
+- [x] Model wallets with identity and balance rules.
+- [x] Implement treasury funding.
+- [x] Implement peer-to-peer transfers.
+- [x] Record successful money movements in memory.
+- [x] Add application use cases for funding and transfers.
+- [x] Expose wallet creation and lookup through a REST API.
+- [x] Expose treasury funding through the API.
+- [x] Expose peer-to-peer transfers through the API.
+- [x] Validate request payloads at the API boundary.
+- [x] Standardize API error response bodies.
+- [x] Add GitHub Actions CI.
+- [x] Expose money movement history through the API.
+- [x] Use response DTOs to keep public API contracts separate from domain objects.
+
+### Next
+
 - [ ] Add PostgreSQL persistence.
 - [ ] Introduce JPA/Hibernate mappings.
+- [ ] Add database schema migrations.
 - [ ] Add integration tests with a real database.
-- [ ] Add idempotency for money movement operations.
-- [ ] Explore a formal double-entry ledger model.
 - [ ] Add Docker-based local environment.
+- [ ] Add idempotency for money movement operations.
+- [ ] Add pagination and filtering for money movement history.
 - [ ] Add OpenAPI documentation.
+- [ ] Explore a formal double-entry ledger model.
