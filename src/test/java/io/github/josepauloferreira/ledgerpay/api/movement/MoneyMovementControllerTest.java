@@ -1,5 +1,6 @@
 package io.github.josepauloferreira.ledgerpay.api.movement;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -34,34 +35,85 @@ class MoneyMovementControllerTest {
 
   @Test
   void shouldListTreasuryFundingMovement() throws Exception {
-    MvcResult walletResult =
-        mockMvc.perform(post("/wallets")).andExpect(status().isCreated()).andReturn();
 
-    String walletId = JsonPath.read(walletResult.getResponse().getContentAsString(), "$.id");
+    String walletId = createWallet();
 
-    String body =
-        """
-    {
-      "amount": "100.00"
-    }
-    """;
-
-    mockMvc
-        .perform(
-            post("/wallets/{id}/funding", walletId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body))
-        .andExpect(status().isOk());
+    fundWallet(walletId, "100.00", "100.00");
 
     mockMvc
         .perform(get("/movements"))
         .andExpect(status().isOk())
         .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0].type").value("TREASURY_FUNDING"))
         .andExpect(jsonPath("$[0].source.type").value("SYSTEM_TREASURY"))
         .andExpect(jsonPath("$[0].destination.type").value("WALLET"))
         .andExpect(jsonPath("$[0].destination.walletId").value(walletId))
         .andExpect(jsonPath("$[0].amount").value("100.00"))
         .andExpect(jsonPath("$[0].occurredAt").isNotEmpty());
+  }
+
+  @Test
+  void shouldListPeerTransferMovement() throws Exception {
+    String sourceWalletId = createWallet();
+    String targetWalletId = createWallet();
+
+    fundWallet(sourceWalletId, "100.00", "100.00");
+
+    mockMvc
+        .perform(
+            post("/wallets/{id}/transfers", sourceWalletId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(transferBody(targetWalletId, "40.00")))
+        .andExpect(status().isOk());
+
+    mockMvc
+        .perform(get("/movements"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$", hasSize(2)))
+        .andExpect(jsonPath("$[1].type").value("PEER_TRANSFER"))
+        .andExpect(jsonPath("$[1].source.type").value("WALLET"))
+        .andExpect(jsonPath("$[1].source.walletId").value(sourceWalletId))
+        .andExpect(jsonPath("$[1].destination.type").value("WALLET"))
+        .andExpect(jsonPath("$[1].destination.walletId").value(targetWalletId))
+        .andExpect(jsonPath("$[1].amount").value("40.00"))
+        .andExpect(jsonPath("$[1].occurredAt").isNotEmpty());
+  }
+
+  private String transferBody(String targetId, String amount) {
+    return """
+      {
+        "targetWalletId": "%s",
+        "amount": "%s"
+      }
+      """
+        .formatted(targetId, amount);
+  }
+
+  private void fundWallet(String id, String amount, String expectedBalance) throws Exception {
+
+    String body =
+        """
+    {
+      "amount": "%s"
+    }
+    """
+            .formatted(amount);
+
+    mockMvc
+        .perform(
+            post("/wallets/{id}/funding", id).contentType(MediaType.APPLICATION_JSON).content(body))
+        .andExpect(status().isOk())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.id").value(id))
+        .andExpect(jsonPath("$.balance").value(expectedBalance));
+  }
+
+  private String createWallet() throws Exception {
+    MvcResult createResult =
+        mockMvc.perform(post("/wallets")).andExpect(status().isCreated()).andReturn();
+
+    return JsonPath.read(createResult.getResponse().getContentAsString(), "$.id");
   }
 }
