@@ -1,6 +1,7 @@
 package io.github.josepauloferreira.ledgerpay.api.movement;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -47,6 +48,7 @@ class MoneyMovementControllerTest {
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0].type").value("TREASURY_FUNDING"))
         .andExpect(jsonPath("$[0].source.type").value("SYSTEM_TREASURY"))
+        .andExpect(jsonPath("$[0].source.walletId").value(nullValue()))
         .andExpect(jsonPath("$[0].destination.type").value("WALLET"))
         .andExpect(jsonPath("$[0].destination.walletId").value(walletId))
         .andExpect(jsonPath("$[0].amount").value("100.00"))

@@ -19,10 +19,10 @@ public class MoneyMovementController {
   }
 
   @GetMapping
-  List<MoneyMovementResponse> listMovements() {
-    var movement = moneyMovementHistory.movements();
+  public List<MoneyMovementResponse> listMovements() {
+    var movements = moneyMovementHistory.movements();
 
-    return movement.stream().map(this::toResponse).toList();
+    return movements.stream().map(this::toResponse).toList();
   }
 
   private MoneyMovementResponse toResponse(MoneyMovement movement) {
