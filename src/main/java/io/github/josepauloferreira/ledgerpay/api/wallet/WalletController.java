@@ -29,7 +29,7 @@ public class WalletController {
   private final TransferMoneyUseCase transferMoneyUseCase;
 
   private WalletResponse toResponse(Wallet wallet) {
-    return new WalletResponse(wallet.id().toString(), wallet.balance().amount().toPlainString());
+    return new WalletResponse(wallet.id().id(), wallet.balance().amount().toPlainString());
   }
 
   private Wallet findWalletOrThrow(String id) {
