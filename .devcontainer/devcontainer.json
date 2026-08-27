@@ -1,0 +1,14 @@
+{
+	"name": "LedgerPay - Java 21",
+	"image": "mcr.microsoft.com/devcontainers/java:3-21-trixie",
+
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"vscjava.vscode-java-pack",
+				"EditorConfig.EditorConfig"
+			]
+		}
+	}
+
+}
